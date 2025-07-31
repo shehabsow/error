@@ -69,10 +69,4 @@ if page == 'STG-2024':
     
         if __name__ == '__main__':
             main()
-    elif page == 'View Logs':
-        st.header('User Activity Logs')
-        st.dataframe(logs_df, width=1000, height=400)
-        csv = logs_df.to_csv(index=False)
-        st.download_button(label="Download Logs as CSV", data=csv, file_name='logs.csv', mime='text/csv')
-            #if st.button("Clear Logs"):
-                #clear_logs()
+   
