@@ -18,8 +18,7 @@ df_Material = pd.read_excel('C2155 Stops.xlsx')
 # Load users data
 
 page = st.sidebar.radio('Select page', ['STG-2024', 'View Logs'])
-    
-    if page == 'STG-2024':
+if page == 'STG-2024':
         def main():
             st.markdown("""
             <style>
