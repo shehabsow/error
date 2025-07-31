@@ -76,8 +76,8 @@ if page == 'STG-2024':
                 col1, col2, col3 = st.columns([2,2,1])
                 col1.write(row["رقم العطل"])
                 col2.write(row["الوصف"] if "الوصف" in df.columns else "")
-                if col3.button("📷 عرض الصورة", key=row["رقم العطل"]):
-                    st.image(row["رابط_الصورة"], caption=f"حل العطل رقم {row['رقم العطل']}")
+                if col3.button("📷 صوره", key=row["رقم العطل"]):
+                    st.image(row["صوره"], caption=f"حل العطل رقم {row['رقم العطل']}")
         if __name__ == '__main__':
             main()
             
