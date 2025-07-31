@@ -14,11 +14,8 @@ st.set_page_config(
 egypt_tz = pytz.timezone('Africa/Cairo')
 df_Material = pd.read_excel('C2155 Stops.xlsx')
 
-# Load users data
 
-    
-    # Load data
-    if 'df' not in st.session_state:
+if 'df' not in st.session_state:
         st.session_state.df = pd.read_excel('C2155 Stops.xlsx')
     
     except FileNotFoundError:
