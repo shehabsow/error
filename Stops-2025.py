@@ -16,10 +16,10 @@ df_Material = pd.read_excel('C2155 Stops.xlsx')
 
 
 if 'df' not in st.session_state:
-        st.session_state.df = pd.read_excel('C2155 Stops.xlsx')
+    st.session_state.df = pd.read_excel('C2155 Stops.xlsx')
     
-    except FileNotFoundError:
-        st.session_state.df = []
+except FileNotFoundError:
+    st.session_state.df = []
 
     page = st.sidebar.radio('Select page', ['STG-2024', 'View Logs'])
     
