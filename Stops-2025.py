@@ -69,7 +69,7 @@ if 'df' not in st.session_state:
                 st.dataframe(search_results, width=1000, height=200)
             st.session_state.refreshed = True 
             
-        
+            st.write(df_Material)
         if __name__ == '__main__':
             main()
             
