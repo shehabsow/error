@@ -72,12 +72,26 @@ if page == 'STG-2024':
             st.write(df_Material)
             df = pd.read_excel("C2155 Stops.xlsx")
 
-            for _, row in df.iterrows():
-                col1, col2, col3 = st.columns([2,2,1])
-                col1.write(row["رقم العطل"])
-                col2.write(row["الوصف"] if "الوصف" in df.columns else "")
-                if col3.button("📷 صوره", key=row["رقم العطل"]):
-                    st.image(row["صوره"], caption=f"حل العطل رقم {row['رقم العطل']}")
+            df = pd.read_excel("C2155 Stops.xlsx")
+
+            st.subheader("قائمة الأعطال")
+            
+            # نستخدم حاوية لعرض تفاصيل العطل عند الضغط
+            placeholder = st.empty()
+            
+            for index, row in df.iterrows():
+                cols = st.columns([2, 2, 1])  # 3 أعمدة
+            
+                cols[0].write(row["رقم العطل"])
+                cols[1].write(row["الوصف"] if "الوصف" in row else "بدون وصف")
+            
+                if cols[2].button("👁️", key=f"view_{index}"):
+                    with placeholder.container():
+                        st.markdown("---")
+                        st.markdown(f"### 🔧 تفاصيل العطل رقم {row['رقم العطل']}")
+                        st.write(f"📄 **الوصف:** {row['الوصف'] if 'الوصف' in row else 'لا يوجد'}")
+                        if "رابط_الصورة" in row:
+                            st.image(row["رابط_الصورة"], caption="الصورة التوضيحية")
         if __name__ == '__main__':
             main()
             
