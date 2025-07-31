@@ -20,7 +20,7 @@ if 'df' not in st.session_state:
     
 
 
-    page = st.sidebar.radio('Select page', ['STG-2024'])
+ page = st.sidebar.radio('Select page', ['STG-2024'])
     
     if page == 'STG-2024':
         def main():
