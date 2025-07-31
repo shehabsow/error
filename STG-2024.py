@@ -12,153 +12,17 @@ st.set_page_config(
     page_icon='🪙')
 
 egypt_tz = pytz.timezone('Africa/Cairo')
-df_Material = pd.read_csv('matril.csv')
-logs_df =  pd.read_csv('logs.csv')
+df_Material = pd.read_excel('C2155 Stops.xlsx')
+
 # Load users data
-def load_users():
-    try:
-        with open('users.json', 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {
-            "knhp322": {"password": "knhp322", "first_login": True, "name": "Shehab Ayman", "last_password_update": str(datetime.now(egypt_tz))},
-            "KFXW551": {"password": "KFXW551", "first_login": True, "name": "Hossameldin Mostafa", "last_password_update": str(datetime.now(egypt_tz))},
-            "knvp968": {"password": "knvp968", "first_login": True, "name": "Mohamed Nader", "last_password_update": str(datetime.now(egypt_tz))},
-            "kcqw615": {"password": "kcqw615", "first_login": True, "name": "Tareek Mahmoud", "last_password_update": str(datetime.now(egypt_tz))}}
 
-# Save users data to JSON file
-def save_users(users):
-    with open('users.json', 'w') as f:
-        json.dump(users, f)
-
-
-def login(username, password):
-    users = load_users()
-    if username in users and users[username]['password'] == password:
-        st.session_state.logged_in = True
-        st.session_state.username = username
-    else:
-        st.error("Invalid username or password")
-
-
-# Update quantity function
-def update_quantity(item_name, quantity, operation, username):
-    # العثور على الصف الذي يتوافق مع اسم العنصر
-    row_index = st.session_state.df[st.session_state.df['Item Name'] == item_name].index[0]
-    
-    last_month = st.session_state.df.loc[row_index, 'Actual Quantity']
-    
-    if operation == 'add':
-        st.session_state.df.loc[row_index, 'Actual Quantity'] += quantity
-    elif operation == 'subtract':
-        st.session_state.df.loc[row_index, 'Actual Quantity'] -= quantity
-    
-    new_quantity = st.session_state.df.loc[row_index, 'Actual Quantity']
-    
-    # حفظ التغييرات في CSV
-    st.session_state.df.to_csv('matril.csv', index=False)
-    
-    # تحديث الملف على GitHub
-    update_csv_on_github(st.session_state.df, 'matril.csv', "Updated CSV with new quantity")
-    
-    # إظهار رسالة نجاح
-    st.success(f"Quantity updated successfully by {username}! New Quantity: {int(new_quantity)}")
-    
-    # حفظ سجل التعديلات
-    log_entry = {
-        'user': username,
-        'time':  datetime.now(egypt_tz).strftime("%Y-%m-%d %H:%M:%S"),
-        'item': item_name,
-        'last_month': last_month,
-        'new_quantity': new_quantity,
-        'operation': operation
-    }
-    st.session_state.logs.append(log_entry)
-    
-    # حفظ السجل في CSV
-    logs_df = pd.DataFrame(st.session_state.logs)
-    logs_df.to_csv('logs.csv', index=False)
-    
-    # تحديث ملف السجلات على GitHub
-    update_csv_on_github(logs_df, 'logs.csv', "Updated logs CSV")
-
-def update_csv_on_github(df, filename, commit_message):
-    g = Github(st.secrets["GITHUB_TOKEN"])
-    repo = g.get_repo(st.secrets["REPO_NAME"])
-    contents = repo.get_contents(filename)
-    csv_buffer = StringIO()
-    df.to_csv(csv_buffer, index=False)
-    repo.update_file(contents.path, commit_message, csv_buffer.getvalue(), contents.sha, branch="main")
-
-# Function to check quantities for each tab and display alerts
-def check_tab_quantities(tab_name, min_quantity):
-    df_tab = st.session_state.df[st.session_state.df['Item Name'] == tab_name]
-    tab_alerts = df_tab[df_tab['Actual Quantity'] < min_quantity]['Item Name'].tolist()
-   
-    return tab_alerts, df_tab
-
-# Function to display each tab
-def display_tab(tab_name, min_quantity):
-    st.header(f'{tab_name}')
-    st.session_state.df['Monthly Consumption'] = st.session_state.df['Monthly Consumption'].astype(int)
-    # إظهار العنصر المحدد في التاب
-    df_tab = st.session_state.df[st.session_state.df['Item Name'] == tab_name]
-    
-    # إظهار معلومات العنصر الحالي
-    st.markdown(f"""
-    <div style='font-size: 20px; color: blue;'>Selected Item: {df_tab['Item Name'].values[0]}</div>
-    <div style='font-size: 20px; color: blue;'>Current Quantity: {int(df_tab['Actual Quantity'].values[0])}</div>
-    """, unsafe_allow_html=True)
-    
-    # إدخال الكمية والعملية
-    quantity = st.number_input(f'Enter quantity for {tab_name}:', min_value=1, step=1, key=f'{tab_name}_quantity')
-    operation = st.radio(f'Choose operation for {tab_name}:', ('add', 'subtract'), key=f'{tab_name}_operation')
-
-    # تحديث الكمية عند الضغط على الزر
-    if st.button('Update Quantity', key=f'{tab_name}_update_button'):
-        update_quantity(tab_name, quantity, operation, st.session_state.username)
-
-    # عرض التحذيرات إذا كانت الكميات منخفضة
-    tab_alerts, df_tab = check_tab_quantities(tab_name, min_quantity)
-    if tab_alerts:
-        st.error(f"Low stock for items in {tab_name}:")
-        st.dataframe(df_tab.style.applymap(lambda x: 'background-color: red' if x < min_quantity else '', subset=['Actual Quantity']))
-
-
-def clear_logs():
-    st.session_state.logs = []
-    logs_df = pd.DataFrame(columns=['user', 'time', 'item', 'old_quantity', 'new_quantity', 'operation'])
-    save_logs(logs_df)
-    st.success("Logs cleared successfully!")
-    
-users = load_users()
-
-# Login Interface
-if 'logged_in' not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.logs = []
-
-if 'logs' not in st.session_state:
-    st.session_state.logs = []
-
-if not st.session_state.logged_in:
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        if st.button("Login"):
-            login(username, password)
-else:
-    st.markdown(f"<div style='text-align: right; font-size: 20px; color: green;'>Logged in by: {users[st.session_state.username]['name']}</div>", unsafe_allow_html=True)
     
     # Load data
     if 'df' not in st.session_state:
-        st.session_state.df = pd.read_csv('matril.csv')
-    try:
-        logs_df = pd.read_csv('logs.csv')
-        st.session_state.logs = logs_df.to_dict('records')
+        st.session_state.df = pd.read_excel('C2155 Stops.xlsx')
+    
     except FileNotFoundError:
-        st.session_state.logs = []
+        st.session_state.df = []
 
     page = st.sidebar.radio('Select page', ['STG-2024', 'View Logs'])
     
