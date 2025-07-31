@@ -70,6 +70,14 @@ if page == 'STG-2024':
             st.session_state.refreshed = True 
             
             st.write(df_Material)
+            df = pd.read_excel("C2155 Stops.xlsx")
+
+            for _, row in df.iterrows():
+                col1, col2, col3 = st.columns([2,2,1])
+                col1.write(row["رقم العطل"])
+                col2.write(row["الوصف"] if "الوصف" in df.columns else "")
+                if col3.button("📷 عرض الصورة", key=row["رقم العطل"]):
+                    st.image(row["رابط_الصورة"], caption=f"حل العطل رقم {row['رقم العطل']}")
         if __name__ == '__main__':
             main()
             
