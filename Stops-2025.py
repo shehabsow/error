@@ -20,7 +20,7 @@ if 'df' not in st.session_state:
     
 
 
-    page = st.sidebar.radio('Select page', ['STG-2024', 'View Logs'])
+    page = st.sidebar.radio('Select page', ['STG-2024'])
     
     if page == 'STG-2024':
         def main():
@@ -69,11 +69,7 @@ if 'df' not in st.session_state:
                 st.dataframe(search_results, width=1000, height=200)
             st.session_state.refreshed = True 
             
-            tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-                'Reel Label (Small)', 'Reel Label (Large)',
-                'Ink Reels for Label', 'Red Tape', 'Adhasive Tape', 'Cartridges', 'MultiPharma Cartridge'
-            ])
-
+        
         if __name__ == '__main__':
             main()
             
