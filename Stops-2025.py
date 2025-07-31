@@ -73,5 +73,8 @@ if 'df' not in st.session_state:
                 'Reel Label (Small)', 'Reel Label (Large)',
                 'Ink Reels for Label', 'Red Tape', 'Adhasive Tape', 'Cartridges', 'MultiPharma Cartridge'
             ])
+
+        if __name__ == '__main__':
+            main()
             
             
