@@ -19,10 +19,9 @@ if 'df' not in st.session_state:
     st.session_state.df = pd.read_excel('C2155 Stops.xlsx')
     
 
+page = st.sidebar.radio('Select page', ['STG-2024'])
 
- page = st.sidebar.radio('Select page', ['STG-2024'])
-    
-    if page == 'STG-2024':
+if page == 'STG-2024':
         def main():
             st.markdown("""
             <style>
